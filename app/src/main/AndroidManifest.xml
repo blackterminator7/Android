@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="sv.edu.ues.eisi.fia.procesosadministrativosfia">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name="sv.edu.ues.eisi.fia.procesosadministrativosfia.MenuEstudiante"></activity>
+        <activity android:name="sv.edu.ues.eisi.fia.procesosadministrativosfia.Diferido_eliminar" />
+        <activity android:name="sv.edu.ues.eisi.fia.procesosadministrativosfia.Diferido_actualizar" />
+        <activity android:name="sv.edu.ues.eisi.fia.procesosadministrativosfia.Diferido_insertar" />
+        <activity android:name="sv.edu.ues.eisi.fia.procesosadministrativosfia.Diferido_consultar" />
+        <activity android:name="sv.edu.ues.eisi.fia.procesosadministrativosfia.Diferido_menu" />
+        <activity android:name="sv.edu.ues.eisi.fia.procesosadministrativosfia.Repetido_Eliminar" />
+        <activity android:name="sv.edu.ues.eisi.fia.procesosadministrativosfia.Repetido_modificar" />
+        <activity android:name="sv.edu.ues.eisi.fia.procesosadministrativosfia.Repetido_Insertar" />
+        <activity android:name="sv.edu.ues.eisi.fia.procesosadministrativosfia.Repetido_Consultar" />
+        <activity android:name="sv.edu.ues.eisi.fia.procesosadministrativosfia.Repetido_menu" />
+        <activity android:name=".MainActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
