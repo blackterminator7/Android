@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+import java.sql.Date;
+
 public class ControladorBase {
 
     private static final String[] camposUsuario = {"username", "password", "nombre_usuario"};
@@ -18,13 +20,12 @@ public class ControladorBase {
     private DatabaseHelper DBHelper;
     private SQLiteDatabase db;
 
-    public ControladorBase(Context context) {
-        this.context = context;
+    public ControladorBase(Context ctx) {
+        this.context = ctx;
         DBHelper = new DatabaseHelper(context);
     }
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
-
         private static final String NOMBRE_BASE = "ProcesosAdmin.s3db";
         private static final int VERSION = 1;
 
@@ -33,11 +34,14 @@ public class ControladorBase {
 
         }
 
-
         @Override
         public void onCreate(SQLiteDatabase db) {
             try {
                 db.execSQL("CREATE TABLE usuario(username VARCHAR(7) NOT NULL PRIMARY KEY, password VARCHAR(10), nombre_usuario VARCHAR (256));");
+                db.execSQL("CREATE TABLE asignatura(codasignatura VARCHAR(6) NOT NULL PRIMARY KEY, nomasignatura VARCHAR(30), unidadesval VARCHAR(1));");
+                db.execSQL("CREATE TABLE ciclo(codciclo VARCHAR(5) NOT NULL PRIMARY KEY, fechadesde DATE, fechahasta DATE);");
+                db.execSQL("CREATE TABLE tipoevaluacion(codtipoeval VARCHAR(2) NOT NULL PRIMARY KEY, nomtipoeval VARCHAR(20));");
+                db.execSQL("CREATE TABLE evaluacion(codevaluacion VARCHAR(10) NOT NULL, codasignatura VARCHAR(6) NOT NULL, codciclo VARCHAR(5) NOT NULL, codtipoeval VARCHAR(2) NOT NULL, numeroevaluacion INTEGER, fechaevaluacion DATE, PRIMARY KEY(codasignatura, codciclo, codtipoeval, codevaluacion));");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -55,7 +59,7 @@ public class ControladorBase {
     }
 
     public void cerrar() {
-        db.close();
+        DBHelper.close();
     }
 
     public boolean consultarUsuario(String username, String password) {
@@ -88,16 +92,107 @@ public class ControladorBase {
         }
         return regAfectados;
     }
+
+    public String insertar(Asignatura asignatura){
+        String regInsertados = "Registro Insertado No. = ";
+        long contador = 0;
+
+        ContentValues asig = new ContentValues();
+        asig.put("codasignatura", asignatura.getCodasignatura());
+        asig.put("nomasignatura", asignatura.getNomasignatura() );
+        asig.put("unidadesval", asignatura.getUnidadesval());
+        contador = db.insert("asignatura", null, asig);
+
+        if(contador == -1 || contador == 0){
+            regInsertados = "Error al Insertar el registro, Registro Duplicado. Verificar Insercion";
+        }else{
+            regInsertados = regInsertados + contador;
+        }
+
+        return regInsertados;
+    }
+
     public String insertar(Estudiante estudiante){
         return "";
     }
+
+    public String insertar(Evaluacion evaluacion){
+        String regInsertados = "Registro Insertado No. = ";
+        long contador = 0;
+
+        if(verificarIntegridadReferencial(evaluacion, 1)){
+            ContentValues evaluaciones = new ContentValues();
+            evaluaciones.put("codasignatura", evaluacion.getCodAsignatura());
+            evaluaciones.put("codciclo", evaluacion.getCodCiclo());
+            evaluaciones.put("codtipoeval", evaluacion.getCodTipoEval());
+            evaluaciones.put("fechaevaluacion", String.valueOf(evaluacion.getFechaEvaluacion()));
+            evaluaciones.put("numeroevaluacion", evaluacion.getNumeroEvaluacion());
+            contador = db.insert("evaluacion", null, evaluaciones);
+        }
+        if(contador == -1 || contador == 0){
+            regInsertados = "Error al Insertar el registro, Registro Duplicado. Verificar Insercion";
+        }else {
+            regInsertados = regInsertados + contador;
+        }
+
+        return regInsertados;
+    }
+
+    public boolean verificarIntegridadReferencial(Object object, int relacion) throws SQLException{
+        switch (relacion){
+            /*case 1: {
+                Usuario user = (Usuario) object;
+                String[] id = {user.getUsername()};
+                Cursor cursor = db.query("usuario", null, "username = ?", id, null, null, null);
+                if (cursor.moveToFirst()) {
+                    return true;
+                } else return false;
+            }*/
+            case 1:
+            {
+                //Verificar que al ingresar Evaluacion exista el TipoEvaluacion, Asignatura y Ciclo
+                Evaluacion evaluacion = (Evaluacion) object;
+                String[] id1 = {evaluacion.getCodAsignatura()};
+                String[] id2 = {evaluacion.getCodCiclo()};
+                String[] id3 = {evaluacion.getCodTipoEval()};
+
+                Cursor cursor1 = db.query("asignatura", null, "codasignatura = ?", id1, null, null, null);
+                Cursor cursor2 = db.query("ciclo", null, "codciclo = ?", id2, null, null, null);
+                Cursor cursor3 = db.query("tipoevaluacion", null, "codtipoeval = ?", id3, null, null, null);
+
+                if(cursor1.moveToFirst() && cursor2.moveToFirst() && cursor3.moveToFirst()){
+                    //Se encontraron los datos
+                    return true;
+                }
+            }
+            default:
+                return false;
+        }
+    }
+
     public String LlenarDatos(){
         final String[] usersId = {"CM17048","RM17039","AG17023","MM14030","PR17017"};
         final String[] names = {"Victor","Shaky","Daniel","Cristian","Roberto"};
         final String[] userPass = {"0123456789","0123456789","0123456789","0123456789","0123456789"};
 
+        final String[] TAcodasignatura = {"MAT115", "FIR115"};
+        final String[] TAnomasignatura = {"Matematicas I", "Fisicas I"};
+        final String[] TAunidadesval = {"4", "4"};
+
+        /*final String[] TCcodciclo = {"12020", "22020"};
+        final Date[] TCfechadesde = {Date.valueOf("2020-02-20"), Date.valueOf("2020-10-08")};
+        final Date[] TCfechahasta = {Date.valueOf("2020-20-06"), Date.valueOf("2020-20-12")};
+
+        final String[] TTEcodtipoeval = {"EP", "ED", "EL"};
+        final String[] TTEnomtipoeval = {"Examen Parcial", "Examen Discusion", "Examen Laboratorio"};*/
+
         abrir();
+
         db.execSQL("DELETE FROM usuario;");
+        db.execSQL("DELETE FROM asignatura");
+        /*db.execSQL("DELETE FROM ciclo");
+        db.execSQL("DELETE FROM tipoevaluacion");*/
+
         Usuario user = new Usuario();
         for (int i = 0; i<5; i++){
             user.setUsername(usersId[i]);
@@ -105,26 +200,29 @@ public class ControladorBase {
             user.setPassword(userPass[i]);
             insertar(user);
         }
+
+        Asignatura asignatura = new Asignatura();
+        for (int i=0; i<2; i++){
+            asignatura.setCodasignatura(TAcodasignatura[i]);
+            asignatura.setNomasignatura(TAnomasignatura[i]);
+            asignatura.setUnidadesval(TAunidadesval[i]);
+            insertar(asignatura);
+        }
+
+        /*Ciclo ciclo = new Ciclo();
+        for( int i=0; i<2; i++){
+            ciclo.setCodciclo(TCcodciclo[i]);
+            ciclo.setFechadesde(TCfechadesde[i]);
+            ciclo.setFechahasta(TCfechahasta[i]);
+        }
+
+        TipoEvaluacion tipoeval = new TipoEvaluacion();
+        for(int i=0; i<3; i++){
+            tipoeval.setCodTipoEval(TTEcodtipoeval[i]);
+            tipoeval.setNomTipoEval(TTEnomtipoeval[i]);
+        }*/
+
         cerrar();
         return "Guardado correctamente";
     }
-
-    /*public boolean verificarIntegridadReferencial(Object object, int relacion) throws SQLException{
-
-        switch (relacion){
-            case 1:
-                Usuario user = (Usuario)object;
-                String [] id = {user.getUsername()};
-                Cursor cursor = db.query("usuario",null,"username = ?", id,null,null,null);
-                if(cursor.moveToFirst()){
-                    return true;
-                }
-                else return false;
-
-
-            default: return false;
-        }
-
-    }*/
-
 }

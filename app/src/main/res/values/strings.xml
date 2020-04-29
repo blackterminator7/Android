@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">Procesos Administrativos FIa</string>
+    <string name="insertar">Insertar</string>
+    <string name="eliminar">Eliminar</string>
+    <string name="actualizar">Actualizar</string>
+    <string name="limpiar">Limpiar</string>
+    <string name="consultar">Consultar</string>
     <string name="ingresarBtn">Ingresar</string>
+    <string name="evaluacion_codigo">Codigo Evaluacion</string>
+    <string name="fecha">Fecha</string>
+    <string name="evaluacion_numero">Numero</string>
+    <string name="codasignatura">Codigo Asignatura</string>
+    <string name="codtipoeval">Tipo Evaluacion</string>
+    <string name="codciclo">Ciclo</string>
 </resources>
