@@ -37,7 +37,13 @@ public class ControladorBase {
         @Override
         public void onCreate(SQLiteDatabase db) {
             try {
-                db.execSQL("CREATE TABLE usuario(username VARCHAR(7) NOT NULL PRIMARY KEY, password VARCHAR(10), nombre_usuario VARCHAR (256));");
+                db.execSQL("CREATE TABLE Usuario(username VARCHAR(7) NOT NULL PRIMARY KEY, password VARCHAR(10), nombre_usuario VARCHAR (256));");
+                db.execSQL("CREATE TABLE Estudiante(carnet VARCHAR(7) NOT NULL PRIMARY KEY, NombreEstudiante VARCHAR(50), ApellidoEstudiante VARCHAR(50), carrera VARCHAR(50))");
+                db.execSQL("CREATE TABLE Docente(idDocente CHARACTER(10) NOT NULL PRIMARY KEY, NombreDocente VARCHAR(50), ApellidoDocente VARCHAR(50));");
+                db.execSQL("CREATE TABLE DetalleDiferidoRepetido(idDetalle CHARACTER(10) NOT NULL PRIMARY KEY, FechaDesde Date, FechaHasta Date, FechaRealizacion Date, HoraRealizacion Time);");
+                db.execSQL("CREATE TABLE TipoDiferidoRepetido(idTipo CHARACTER(10) NOT NULL PRIMARY KEY, NombreTipo VARCHAR(50));");
+                db.execSQL("CREATE TABLE Escuela(IdEscuela CHARACTERS(10) NOT NULL PRIMARY KEY, NombreEscuela VARCHAR(50), Facultad VARCHAR(50))");
+                db.execSQL("CREATE");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
